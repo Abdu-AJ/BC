@@ -72,7 +72,7 @@
                 const accounts = await ethereum.request({ method: "eth_requestAccounts" });
                 account = accounts[0];
                 document.getElementById("userArea").innerHTML = `Account ID: ${account}`;
-                await getBalance(account); // Call getBalance function here
+                await getBalance(account);
             } catch (error) {
                 console.error("Connection Error:", error);
             }
@@ -89,10 +89,25 @@
             });
             const etherBalance = ethers.utils.formatEther(balance);
             document.getElementById("userArea").innerHTML += `<br>Current Balance: ${etherBalance} ETH`;
-        } catch (error) {
+            const etherPriceUSD = await getEtherPriceInUSD();
+            const balanceInUSD = etherBalance * etherPriceUSD;
+            document.getElementById("userArea").innerHTML += `<br>Balance in USD: $${balanceInUSD.toFixed(2)}`;
+        } 
+        catch (error) {
             console.error("Balance Retrieval Error:", error);
         }
     };
+    const getEtherPriceInUSD = async () => {
+        try {
+            const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+            const data = await response.json();
+            return data.ethereum.usd;
+        } catch (error) {
+            console.error("Error fetching Ether price:", error);
+            return 0;
+        }
+    };
+
 </script>
 
 </body>
